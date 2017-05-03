@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+  "name": "TestWebExt",
+  "version": "1.0",
+
+  "description": "Test IndexedDB and Chrome storage.",
+
+  "icons": {
+    "48": "icons/cliqz-icon.png"
+  },
+
+  "permissions": [
+    "activeTab"
+  ],
+
+  "browser_action": {
+    "default_icon": "icons/cliqz-icon.png",
+    "default_title": "MyWebExt",
+    "default_popup": "popup/testStorage.html"
+  },
+
+  "web_accessible_resources": [
+    "data/database.json"
+  ]
+
+}
