@@ -2,7 +2,7 @@
 function main(request, sender, sendResponse) {
   removeEverything();
   insertInfo(request.info);
-  browser.runtime.onMessage.removeListener(main);
+  chrome.runtime.onMessage.removeListener(main);
 }
 
 
@@ -22,4 +22,4 @@ function insertInfo(info) {
 /*
 Assign beastify() as a listener for messages from the extension.
 */
-browser.runtime.onMessage.addListener(main);
+chrome.runtime.onMessage.addListener(main);

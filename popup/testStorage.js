@@ -1,43 +1,47 @@
 /*
 Given the name of a beast, get the URL to the corresponding image.
 */
-const dataURL = browser.extension.getURL("data/bloom_filter.json"); // 500KB
+const dataURL = chrome.extension.getURL("data/bloom_filter.json"); // 500KB
 let nItems = 42600;
 let myStorage;
 const dbName = 'myDatabase';
 
 function sendInfo(data) {
-  browser.tabs.executeScript(null, { 
+  chrome.tabs.executeScript(null, {
     file: "/content_scripts/main.js" 
   });
-  const gettingActiveTab = browser.tabs.query({ active: true, currentWindow: true });
-  gettingActiveTab.then((tabs) => {
-    browser.tabs.sendMessage(tabs[0].id, { info: data });
-  });
+  return new Promise((resolve, reject) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, resolve);
+  }).then((tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, { info: data });
+  })
 }
 
 $('#btnWrite').click(function(e) {
   // sendInfo(`Getting data ..`);
   $.getJSON(dataURL, function(json) {
+
     const data = json; // JSON && JSON.parse(json) || $.parseJSON(json);
     // sendInfo(`Finished getting data. Time Elapsed: ${Date.now() - startTime}ms`);
     nItems = data.bkt.length;
-    console.log(nItems)
-    
+    console.log(nItems);
+  
     sendInfo(`Writing data ..`);
+    
     const startTime = Date.now();
     switch ($('#storageSelect').val()) {
       case "IndexedDB":
         let db;
         myStorage = indexedDB;
-        const request = myStorage.open(dbName, 3);
+        const request = myStorage.open(dbName, 5);
         request.onerror = function(event) {
-          alert("Why didn't you allow my web app to use IndexedDB?!");
+          // alert("Why didn't you allow my web app to use IndexedDB?!");
         };
         request.onsuccess = function(event) {
           db = event.target.result;
         };
         request.onupgradeneeded = function(event) {
+          $('#btnWrite').text('AAA');
           console.log('On upgrade');
           db = event.target.result;
           let objectStore = db.createObjectStore("bkt", { autoIncrement: true });
@@ -68,9 +72,9 @@ $('#btnRead').click(function(e) {
     case "IndexedDB":
       let db;
       myStorage = indexedDB;
-      const request = myStorage.open(dbName, 3);
+      const request = myStorage.open(dbName, 5);
       request.onerror = function(event) {
-        alert("Why didn't you allow my web app to use IndexedDB?!");
+        // alert("Why didn't you allow my web app to use IndexedDB?!");
       };
       request.onsuccess = function(event) {
         db = event.target.result;
@@ -109,6 +113,6 @@ $('#btnRead').click(function(e) {
 $('#btnReset').click(function(e) {
   localStorage.clear();
   indexedDB.deleteDatabase(dbName);
-  browser.tabs.reload();
+  chrome.tabs.reload();
   window.close();
 });
